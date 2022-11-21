@@ -1,6 +1,7 @@
 import { HTMLElement, NodeType } from "node-html-parser";
+import { client, indexToDB } from "./index-db";
 
-export const getTerms = (document: HTMLElement) => {
+const getTerms = (document: HTMLElement) => {
   const keywords: Record<string, number> = {};
   for (const node of document.childNodes) {
     const text = node.textContent;
@@ -14,4 +15,10 @@ export const getTerms = (document: HTMLElement) => {
     }
   }
   return keywords;
+};
+
+export const index = async (document: HTMLElement, path: string) => {
+  const terms = getTerms(document);
+  const keyword = Object.keys(terms)[0];
+  const index = { name: path, keyword };
 };

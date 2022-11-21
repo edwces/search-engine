@@ -1,7 +1,7 @@
 import axios from "axios";
 import { parse, HTMLElement } from "node-html-parser";
 import { SEED_PAGE_URL } from "./constants";
-import { getTerms } from "./indexing-engine";
+import { index } from "./index-engine";
 
 export class Crawler {
   private url?: string;
@@ -19,7 +19,7 @@ export class Crawler {
    * Crawls webpage and all of it's pages
    * by finding them by links in each document
    */
-  async proccess() {
+  async process() {
     const parsed: string[] = [];
     let queue: string[] = ["/"];
 
@@ -30,12 +30,14 @@ export class Crawler {
       parsed.push(path);
 
       const links = this.getRelativeUrls(document);
+
       queue.push(...links);
 
       queue = queue.filter((link) => parsed.indexOf(link) === -1);
+
       // --------
       // Indexing Engine proccess
-      const terms = getTerms(document);
+      await index(document, path);
       // --------
     }
   }
@@ -66,4 +68,4 @@ export class Crawler {
 
 const crawler = new Crawler();
 crawler.goto(SEED_PAGE_URL);
-crawler.proccess();
+crawler.process();
