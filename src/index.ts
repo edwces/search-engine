@@ -1,5 +1,5 @@
 import express from "express";
-import { search } from "./engine/query-engine";
+import { client, getWebsitesByPage } from "./engine/index-db";
 
 const PORT = 3000;
 const app = express();
@@ -7,17 +7,32 @@ const app = express();
 app.set("views", "./templates");
 app.set("view engine", "ejs");
 
-app.listen(PORT, () => {
-  console.log("Listening on http://localhost:3000/");
-});
-
 app.get("/", (_, response) => {
   response.render("index");
 });
 
-app.get("/search", (request, response) => {
-  const { query } = request.params as any;
+app.get("/search", async (request, response) => {
+  const { query, page } = request.query as any;
   if (!query) response.sendStatus(404);
-  const results = search(query);
-  // render results
+  const websites = await getWebsitesByPage(client, page);
+  response.render("search", { websites });
 });
+
+const bootstrap = async () => {
+  client
+    .connect()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log("Listening on http://localhost:3000/");
+      });
+    })
+    .catch((err) => console.log(`[DB]: error connecting to db: ${err}`));
+};
+
+process.on("SIGINT", async () => {
+  client.end();
+  console.log("[DB]: connection closed");
+  process.exit(0);
+});
+
+bootstrap();

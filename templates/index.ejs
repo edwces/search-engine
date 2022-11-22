@@ -24,16 +24,27 @@
 
     }
 
-    .searchbar {
+    .searchinput {
         padding: 0.5rem;
         font-size: larger;
         width: 25%;
     }
+    .searchbar {
+        display: flex;
+        gap: 10px;
+    }
+
 </style>
 <body>
     <div class="center">
         <h1 class="big-logo">Moogle</h1>
-        <input class="searchbar"></input>
+        <form action="/search">
+            <div class="searchbar">
+                <input class="searchinput" name="query" value=""></input>
+                <input type="hidden" name="page" value="1" /> 
+                <button type="submit">Search</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>

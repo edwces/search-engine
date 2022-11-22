@@ -6,7 +6,8 @@ dotenv.config();
 
 interface Index {
   url: string;
-  keyword?: string;
+  title?: string | null;
+  description?: string | null;
 }
 
 export const client = new Client({
@@ -18,6 +19,12 @@ export const client = new Client({
 });
 
 export const indexToDB = async (client: Client, index: Index) => {
-  const query = "INSERT INTO indexes(name, keyword) VALUES($1, $2)";
-  await client.query(query, [index.url, index.keyword]);
+  const query =
+    "INSERT INTO indexes(url, title, description) VALUES($1, $2, $3)";
+  await client.query(query, [index.url, index.title, index.description]);
+};
+
+export const getWebsitesByPage = async (client: Client, page: number) => {
+  const query = "SELECT * FROM indexes";
+  return client.query(query).then((data) => data.rows);
 };

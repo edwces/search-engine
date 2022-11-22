@@ -42,13 +42,6 @@ export class Crawler {
       // --------
     }
   }
-  /**
-   * Gets Metadata from webpage from manifest.json
-   */
-  async getMetadata() {
-    const response = await axios.get(`${this.url}/manifest.json`);
-    return response.data;
-  }
 
   /**
    * Find out relative urls in a current page
