@@ -1,6 +1,7 @@
 import axios from "axios";
 import { parse, HTMLElement } from "node-html-parser";
 import { SEED_PAGE_URL } from "./constants";
+import { client } from "./index-db";
 import { index } from "./index-engine";
 
 export class Crawler {
@@ -37,7 +38,7 @@ export class Crawler {
 
       // --------
       // Indexing Engine proccess
-      await index(document, path);
+      await index(document, `${this.url}${path}`);
       // --------
     }
   }
@@ -65,7 +66,20 @@ export class Crawler {
       ) as string[];
   }
 }
+const bootstrap = async () => {
+  client
+    .connect()
+    .then(() => {
+      const crawler = new Crawler();
+      crawler.goto(SEED_PAGE_URL);
+      crawler.process();
+    })
+    .catch((err) => console.log(`[DB]: error connecting to db: ${err}`));
+};
 
-const crawler = new Crawler();
-crawler.goto(SEED_PAGE_URL);
-crawler.process();
+process.on("SIGINT", async () => {
+  client.end();
+  console.log("[DB]: connection closed");
+});
+
+bootstrap();
